@@ -1,73 +1,77 @@
-# React + TypeScript + Vite
+# Simulated Annealing Timetable (Graph Coloring) Demo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A minimal React + TypeScript app (with Vite & TailwindCSS) that demonstrates the **simulated annealing algorithm** for solving a graph coloring challenge (e.g., lesson/timetable scheduling). Nodes are colored, and conflicts (two connected nodes with the same color) are minimized interactively.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Graph coloring simulation** using simulated annealing logic.
+- Interactive SVG-based visualization of the graph:
+  - Nodes colored by state (conflicts highlighted on edges).
+  - Step-by-step and animated simulation controls.
+- Add custom colors to the palette dynamically.
+- Real-time logging (mutation info, deltaE, acceptance, etc.).
+- UI in French.
 
-## React Compiler
+## Demo
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+![screenshot](screenshot.png) <!-- Add an actual screenshot if possible -->
 
-## Expanding the ESLint configuration
+## How it works
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Nodes:** Represent events/resources with (x,y) coordinates, colored for assignment.
+- **Edges:** Represent conflicts—two connected nodes must have different colors.
+- **Energy:** Number of edges where both ends have the same color (conflict).
+- **Annealing Algorithm:** At each step, a random node tries a new color; if the overall energy (conflicts) rises, the change is sometimes accepted with probability `exp(-deltaE/temperature)`.
+- **Temperature:** Decreases after each step, reducing the chance of making things "worse" over time.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+The algorithm progresses toward a coloring with minimal (ideally zero) conflicts.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Tech Stack
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **Frontend:** React 19 / TypeScript / Vite
+- **Styling:** TailwindCSS (v4)
+- **State & Logic:** React hooks (`useSimulatedAnnealing`) for running the algorithm and state management
+- **SVG rendering** for the graph
+
+## Getting Started
+
+```bash
+git clone https://github.com/depicon/simulated-annealing-sample.git
+cd simulated-annealing-sample
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## File structure
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- `src/App.tsx` – Main UI, controls, and display
+- `src/hooks/useSimulatedAnnealing.ts` – Simulated annealing algorithm and state
+- `src/components/GraphView.tsx` – SVG visual rendering of the graph
+
+## Example: Algorithm excerpt
+
+```typescript
+const [temperature, setTemperature] = useState(10);
+const coolingRate = 0.90;
+
+const nextStep = useCallback(() => {
+  // Random node chooses a new color
+  // If energy drops, accept. Otherwise, accept with probability exp(-deltaE/temperature)
+  // Reduce temperature each step
+}, [nodes, edges, temperature, energy, colors]);
 ```
+
+## Customization
+
+- Change the initial graph, colors, or annealing parameters in `useSimulatedAnnealing.ts`.
+- Update UI or add new controls in `App.tsx`.
+
+## License
+
+MIT
+
+---
+
+Made by [depicon](https://github.com/depicon)
